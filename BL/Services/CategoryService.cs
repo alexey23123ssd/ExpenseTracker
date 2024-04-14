@@ -15,7 +15,7 @@ namespace BL.Services
             _dbContext = dbContext??throw new ArgumentNullException(nameof(dbContext));
             _mapper = mapper?? throw new ArgumentNullException(nameof(mapper));
         }
-        public ServiceDataResponse<Guid> CreateCategory(Category category)
+        public async Task<ServiceDataResponse<Guid>> CreateCategory(Category category)
         {
             if(category == null)
             {
@@ -25,7 +25,8 @@ namespace BL.Services
                     IsSuccess = false
                 };
             }
-            if(_dbContext.Categories.Any(c => c.Name == category.Name))
+
+            if(await _dbContext.Categories.AnyAsync(c => c.Name == category.Name))
             {
                 return new ServiceDataResponse<Guid>
                 {
@@ -33,11 +34,15 @@ namespace BL.Services
                     IsSuccess = false
                 };
             }
-            var categoryId=Guid.NewGuid();
+
+            var categoryId = Guid.NewGuid();
             var dalCategory = _mapper.Map<DAL.Models.Category>(category);
             dalCategory.Id = categoryId;
+
             _dbContext.Categories.Add(dalCategory);
-            _dbContext.SaveChanges();
+
+            await _dbContext.SaveChangesAsync();
+
             return new ServiceDataResponse<Guid>
             {
                 IsSuccess = true,
@@ -45,9 +50,9 @@ namespace BL.Services
             };
         }
 
-        public ServiceResponse DeleteCategory(Guid categoryId)
+        public async Task<ServiceResponse> DeleteCategory(Guid categoryId)
         {
-            if (!_dbContext.Categories.Any(c => c.Id == categoryId))
+            if (!await _dbContext.Categories.AnyAsync(c => c.Id == categoryId))
             {
                 return new ServiceDataResponse<Guid>
                 {
@@ -61,7 +66,7 @@ namespace BL.Services
 
             dalCategory.IsDeleted= true;
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return new ServiceDataResponse<Guid>
             {
@@ -70,9 +75,9 @@ namespace BL.Services
             };
         }
 
-        public ServiceDataResponse<Category> GetCategoryById(Guid categoryId)
+        public async Task<ServiceDataResponse<Category>> GetCategoryById(Guid categoryId)
         {
-            if(!_dbContext.Categories.Any(c => c.Id == categoryId))
+            if(!await _dbContext.Categories.AnyAsync(c => c.Id == categoryId))
             {
                 return new ServiceDataResponse<Category>
                 {
@@ -92,9 +97,9 @@ namespace BL.Services
             };
         }
 
-        public ServiceDataResponse<IEnumerable<Category>> GetCategories()
+        public async Task<ServiceDataResponse<IEnumerable<Category>>> GetCategories()
         {
-            if (!_dbContext.Categories.Any())
+            if (!await _dbContext.Categories.AnyAsync())
             {
                 return new ServiceDataResponse<IEnumerable<Category>>
                 {
@@ -113,9 +118,9 @@ namespace BL.Services
             };
         }
 
-        public ServiceDataResponse<Category> UpdateCategory(Category Category)
+        public async Task<ServiceDataResponse<Category>> UpdateCategory(Category Category)
         {
-            if(!_dbContext.Categories.Any(c=>c.Id == Category.Id))
+            if(!await _dbContext.Categories.AnyAsync(c=>c.Id == Category.Id))
             {
                 return new ServiceDataResponse<Category>
                 {
@@ -127,7 +132,7 @@ namespace BL.Services
             var dalCategory = _mapper.Map<DAL.Models.Category>(Category);
             var result = _dbContext.Categories.SingleOrDefault(c => c.Id == Category.Id);
             _dbContext.Categories.Update(result);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             var blCategory = _mapper.Map<Category>(result);
 
             return new ServiceDataResponse<Category>()
