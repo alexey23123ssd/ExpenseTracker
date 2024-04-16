@@ -13,5 +13,7 @@ namespace DAL.Models
         [Required]
         public Category? Category { get; set; }
 
+        public bool? IsDeleted { get; set; }
+
     }
 }

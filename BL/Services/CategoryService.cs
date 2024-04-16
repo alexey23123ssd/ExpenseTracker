@@ -15,22 +15,22 @@ namespace BL.Services
             _dbContext = dbContext??throw new ArgumentNullException(nameof(dbContext));
             _mapper = mapper?? throw new ArgumentNullException(nameof(mapper));
         }
-        public async Task<ServiceDataResponse<Guid>> CreateCategory(Category category)
+        public async Task<ServiceDataResponse<Category>> CreateCategoryAsync(Category category)
         {
             if(category == null)
             {
-               return new ServiceDataResponse<Guid>
+               return new ServiceDataResponse<Category>
                 {
                     ErrorMessage = "Data cannot be null",
                     IsSuccess = false
                 };
             }
 
-            if(await _dbContext.Categories.AnyAsync(c => c.Name == category.Name))
+            if(await _dbContext.Categories.AnyAsync(c => c.Id == category.Id))
             {
-                return new ServiceDataResponse<Guid>
+                return new ServiceDataResponse<Category>
                 {
-                    ErrorMessage = "Category with this name already exist",
+                    ErrorMessage = "Category with this Id already exist",
                     IsSuccess = false
                 };
             }
@@ -38,19 +38,20 @@ namespace BL.Services
             var categoryId = Guid.NewGuid();
             var dalCategory = _mapper.Map<DAL.Models.Category>(category);
             dalCategory.Id = categoryId;
+            var blCategory = _mapper.Map<Category>(category);
 
             _dbContext.Categories.Add(dalCategory);
 
             await _dbContext.SaveChangesAsync();
 
-            return new ServiceDataResponse<Guid>
+            return new ServiceDataResponse<Category>
             {
                 IsSuccess = true,
-                Data = categoryId,
+                Data = blCategory,
             };
         }
 
-        public async Task<ServiceResponse> DeleteCategory(Guid categoryId)
+        public async Task<ServiceResponse> DeleteCategoryAsync(Guid categoryId)
         {
             if (!await _dbContext.Categories.AnyAsync(c => c.Id == categoryId))
             {
@@ -75,7 +76,7 @@ namespace BL.Services
             };
         }
 
-        public async Task<ServiceDataResponse<Category>> GetCategoryById(Guid categoryId)
+        public async Task<ServiceDataResponse<Category>> GetCategoryByIdAsync(Guid categoryId)
         {
             if(!await _dbContext.Categories.AnyAsync(c => c.Id == categoryId))
             {
@@ -97,7 +98,7 @@ namespace BL.Services
             };
         }
 
-        public async Task<ServiceDataResponse<IEnumerable<Category>>> GetCategories()
+        public async Task<ServiceDataResponse<IEnumerable<Category>>> GetCategoriesAsync()
         {
             if (!await _dbContext.Categories.AnyAsync())
             {
@@ -118,7 +119,7 @@ namespace BL.Services
             };
         }
 
-        public async Task<ServiceDataResponse<Category>> UpdateCategory(Category Category)
+        public async Task<ServiceDataResponse<Category>> UpdateCategoryAsync(Category Category)
         {
             if(!await _dbContext.Categories.AnyAsync(c=>c.Id == Category.Id))
             {

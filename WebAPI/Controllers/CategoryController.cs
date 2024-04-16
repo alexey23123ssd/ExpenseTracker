@@ -21,21 +21,21 @@ namespace WebAPI.Controllers
         [Route("create")]
         public IActionResult CreateCategory([FromBody]Category category)
         {
-            return Json(_categoryService.CreateCategory(_mapper.Map<BL.Models.Category>(category)));
+            return Json(_categoryService.CreateCategoryAsync(_mapper.Map<BL.Models.Category>(category)));
         }
 
         [HttpDelete]
         [Route("delete")]
         public IActionResult DeleteCategory([FromQuery] Guid id)
         {
-            return Json(_categoryService.DeleteCategory(id));
+            return Json(_categoryService.DeleteCategoryAsync(id));
         }
 
         [HttpGet]
         [Route("get")]
         public IActionResult GetCategory([FromQuery] Guid id)
         {
-            return Json(_categoryService.GetCategoryById(id));
+            return Json(_categoryService.GetCategoryByIdAsync(id));
         }
     }
 }

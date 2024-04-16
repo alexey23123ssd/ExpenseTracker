@@ -3,10 +3,10 @@ namespace BL.Services.Interfaces
 {
     public interface IAccountService
     {
-        ServiceDataResponse<Guid> CreateAccount(Account account);
-        ServiceDataResponse<IEnumerable<Account>> GetAccounts();
-        ServiceDataResponse<Account> GetAccountById(int id);
-        ServiceDataResponse<Account> UpdateAccount(Account account);
-        ServiceResponse DeleteAccount(Account account);
+        Task<ServiceDataResponse<Account>> CreateAccountAsync(Account account);
+        Task<ServiceDataResponse<IEnumerable<Account>>> GetAccountsAsync();
+        Task<ServiceDataResponse<Account>> GetAccountByIdAsync(int id);
+        Task<ServiceDataResponse<Account>> UpdateAccountAsync(Account account);
+        Task<ServiceResponse> DeleteAccountAsync(Guid id);
     }
 }

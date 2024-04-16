@@ -6,5 +6,6 @@
         public required string Name { get; set; }
         public ICollection<Expense>? Expenses { get; set; }
 
+        public bool? IsDeleted { get; set; }
     }
 }
