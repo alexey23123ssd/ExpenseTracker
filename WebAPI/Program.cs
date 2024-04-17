@@ -25,6 +25,8 @@ namespace WebAPI
             builder.Services.AddTransient<ExpenseTrackerDbContext, ExpenseTrackerDbContext>();
             builder.Services.AddAutoMapper(typeof(DalBlMappingProfile),typeof(DtoBlMappingProfile));
             builder.Services.AddScoped<ICategoryService,CategoryService>();
+            builder.Services.AddScoped<IAccountService,AccountService>();
+            builder.Services.AddScoped<IExpenseService,ExpenseService>();
             builder.Services.AddControllers();
 
             var app = builder.Build();
