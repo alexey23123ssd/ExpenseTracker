@@ -5,7 +5,7 @@ namespace BL.Services.Interfaces
     {
         Task<ServiceDataResponse<Account>> CreateAccountAsync(Account account);
         Task<ServiceDataResponse<IEnumerable<Account>>> GetAccountsAsync();
-        Task<ServiceDataResponse<Account>> GetAccountByIdAsync(int id);
+        Task<ServiceDataResponse<Account>> GetAccountByIdAsync(Guid id);
         Task<ServiceDataResponse<Account>> UpdateAccountAsync(Account account);
         Task<ServiceResponse> DeleteAccountAsync(Guid id);
     }

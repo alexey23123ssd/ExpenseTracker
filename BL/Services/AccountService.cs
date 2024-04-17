@@ -20,7 +20,7 @@ namespace BL.Services
         public AccountService(ExpenseTrackerDbContext dbContext, IMapper mapper)
         {
              _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));    
-             _mapper = mapper ?? throw new ArgumentNullException(nameof(_mapper));
+             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task<ServiceDataResponse<Account>> CreateAccountAsync(Account account)
@@ -34,11 +34,11 @@ namespace BL.Services
                 };
             }
 
-            if(await _dbContext.Accounts.AnyAsync(a =>  a.Id == account.Id))
+            if(await _dbContext.Accounts.AnyAsync(a =>  a.Name == account.Name))
             {
                 return new ServiceDataResponse<Account>
                 {
-                    ErrorMessage = "Account with this Id already exists",
+                    ErrorMessage = "Account with this Name already exists",
                     IsSuccess = false,
                 };
             }
@@ -60,7 +60,8 @@ namespace BL.Services
 
         public async Task<ServiceResponse> DeleteAccountAsync(Guid id)
         {
-            if (!await _dbContext.Accounts.AnyAsync(a => a.Id == id))
+            var dalAccount = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Id == id);
+            if (dalAccount == null)
             {
                 return new ServiceDataResponse<Guid>
                 {
@@ -68,7 +69,7 @@ namespace BL.Services
                     IsSuccess = false,
                 };
             }
-            var dalAccount = _mapper.Map<DAL.Models.Account>(id);
+
             _dbContext.Accounts.Remove(dalAccount);
 
             dalAccount.IsDeleted = true;
@@ -81,19 +82,74 @@ namespace BL.Services
             };
         }
 
-        public Task<ServiceDataResponse<Account>> GetAccountByIdAsync(int id)
+        public async Task<ServiceDataResponse<Account>> GetAccountByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var dalAccount = await _dbContext.Accounts.SingleOrDefaultAsync(a=>a.Id == id);
+
+            if(dalAccount == null)
+            {
+                return new ServiceDataResponse<Account>
+                {
+                    ErrorMessage = "Account doesnt exsist",
+                    IsSuccess = false,
+                };
+            }
+
+            var blAccount = _mapper.Map<Account>(dalAccount);
+
+            return new ServiceDataResponse<Account>
+            {
+                IsSuccess = true,
+                Data = blAccount,
+            };
         }
 
-        public Task<ServiceDataResponse<IEnumerable<Account>>> GetAccountsAsync()
+        public async Task<ServiceDataResponse<IEnumerable<Account>>> GetAccountsAsync()
         {
-            throw new NotImplementedException();
+            var accounts = await _dbContext.Accounts.ToListAsync();
+
+            if(accounts == null)
+            {
+                return new ServiceDataResponse<IEnumerable<Account>>
+                {
+                    ErrorMessage = "Accounts doesnt exsist",
+                    IsSuccess = false,
+                };
+            }
+
+            var blAccounts = _mapper.Map<IEnumerable<Account>>(accounts);
+
+            return new ServiceDataResponse<IEnumerable<Account>>
+            {
+                IsSuccess = true,
+                Data = blAccounts
+            };
         }
 
-        public Task<ServiceDataResponse<Account>> UpdateAccountAsync(Account account)
+        public async Task<ServiceDataResponse<Account>> UpdateAccountAsync(Account account)
         {
-            throw new NotImplementedException();
+            var dalAccount = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == account.Id);
+
+            if (dalAccount == null)
+            {
+                return new ServiceDataResponse<Account>
+                {
+                    ErrorMessage = "Category doesnt exist",
+                    IsSuccess = false
+                };
+            }
+
+            _dbContext.Accounts.Update(dalAccount);
+
+            await _dbContext.SaveChangesAsync();
+
+            var blAccount = _mapper.Map<Account>(dalAccount);
+
+            return new ServiceDataResponse<Account>()
+            {
+                IsSuccess = true,
+                Data = blAccount
+            };
         }
     }
 }

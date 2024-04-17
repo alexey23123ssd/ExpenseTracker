@@ -53,7 +53,8 @@ namespace BL.Services
 
         public async Task<ServiceResponse> DeleteCategoryAsync(Guid categoryId)
         {
-            if (!await _dbContext.Categories.AnyAsync(c => c.Id == categoryId))
+            var dalCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            if (dalCategory == null)
             {
                 return new ServiceDataResponse<Guid>
                 {
@@ -62,7 +63,6 @@ namespace BL.Services
                 };
             }
 
-            var dalCategory = _mapper.Map<DAL.Models.Category>(categoryId);
             _dbContext.Categories.Remove(dalCategory);
 
             dalCategory.IsDeleted= true;
@@ -78,7 +78,9 @@ namespace BL.Services
 
         public async Task<ServiceDataResponse<Category>> GetCategoryByIdAsync(Guid categoryId)
         {
-            if(!await _dbContext.Categories.AnyAsync(c => c.Id == categoryId))
+            var dalCategory = await _dbContext.Categories.SingleOrDefaultAsync(c => c.Id == categoryId);
+
+            if (dalCategory==null)
             {
                 return new ServiceDataResponse<Category>
                 {
@@ -87,9 +89,7 @@ namespace BL.Services
                 };
             }
 
-            var dalCategory = _mapper.Map<DAL.Models.Category>(categoryId);
-            var result=_dbContext.Categories.SingleOrDefault(c => c.Id == categoryId);
-            var blCategory=_mapper.Map<Category>(result);
+            var blCategory=_mapper.Map<Category>(dalCategory);
 
             return new ServiceDataResponse<Category>
             {
@@ -100,7 +100,8 @@ namespace BL.Services
 
         public async Task<ServiceDataResponse<IEnumerable<Category>>> GetCategoriesAsync()
         {
-            if (!await _dbContext.Categories.AnyAsync())
+            var categories = await _dbContext.Categories.ToListAsync();
+            if (categories == null)
             {
                 return new ServiceDataResponse<IEnumerable<Category>>
                 {
@@ -109,7 +110,6 @@ namespace BL.Services
                 };
             }
 
-            var categories = _dbContext.Categories.ToList();
             var blCategories = _mapper.Map<IEnumerable<Category>>(categories);
 
             return new ServiceDataResponse<IEnumerable<Category>>() 
@@ -119,9 +119,11 @@ namespace BL.Services
             };
         }
 
-        public async Task<ServiceDataResponse<Category>> UpdateCategoryAsync(Category Category)
+        public async Task<ServiceDataResponse<Category>> UpdateCategoryAsync(Category category)
         {
-            if(!await _dbContext.Categories.AnyAsync(c=>c.Id == Category.Id))
+            var dalCategory = await _dbContext.Categories.FirstOrDefaultAsync(c=>c.Id==category.Id);
+
+            if (dalCategory==null)
             {
                 return new ServiceDataResponse<Category>
                 {
@@ -130,11 +132,11 @@ namespace BL.Services
                 };
             }
 
-            var dalCategory = _mapper.Map<DAL.Models.Category>(Category);
-            var result = _dbContext.Categories.SingleOrDefault(c => c.Id == Category.Id);
-            _dbContext.Categories.Update(result);
+            _dbContext.Categories.Update(dalCategory);
+
             await _dbContext.SaveChangesAsync();
-            var blCategory = _mapper.Map<Category>(result);
+
+            var blCategory = _mapper.Map<Category>(dalCategory);
 
             return new ServiceDataResponse<Category>()
             {

@@ -13,6 +13,6 @@ namespace BL.Services.Interfaces
         Task<ServiceDataResponse<Expense>> GetExpenseByIdAsync(Guid id);
         Task<ServiceDataResponse<Expense>> CreateExpenseAsync(Expense expense);
         Task<ServiceDataResponse<Expense>> UpdateExpenseAsync(Expense expense);
-        Task<ServiceResponse> DeleteExpenseAsync(Expense expense);
+        Task<ServiceResponse> DeleteExpenseAsync(Guid id);
     }
 }

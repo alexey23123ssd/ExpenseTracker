@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BL.Services;
 using BL.Services.Interfaces;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
@@ -19,23 +20,31 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("create")]
-        public IActionResult CreateCategory([FromBody]Category category)
+        public async Task<IActionResult> CreateCategory([FromBody]Category category)
         {
-            return Json(_categoryService.CreateCategoryAsync(_mapper.Map<BL.Models.Category>(category)));
+            return Json(await _categoryService.CreateCategoryAsync(_mapper.Map<BL.Models.Category>(category)));
         }
 
         [HttpDelete]
         [Route("delete")]
-        public IActionResult DeleteCategory([FromQuery] Guid id)
+        public async Task<IActionResult> DeleteCategory([FromQuery] Guid id)
         {
-            return Json(_categoryService.DeleteCategoryAsync(id));
+            return Json(await _categoryService.DeleteCategoryAsync(id));
         }
 
         [HttpGet]
         [Route("get")]
-        public IActionResult GetCategory([FromQuery] Guid id)
+        public async Task<IActionResult> GetCategory([FromQuery] Guid id)
         {
-            return Json(_categoryService.GetCategoryByIdAsync(id));
+            return Json(await _categoryService.GetCategoryByIdAsync(id));
+        }
+
+        [HttpPut]
+        [Route("put")]
+        public async Task<IActionResult> UpdateCategory([FromQuery] Category category)
+        {
+            var blCategory = _mapper.Map<BL.Models.Category>(category);
+            return Json(await _categoryService.UpdateCategoryAsync(blCategory));
         }
     }
 }
