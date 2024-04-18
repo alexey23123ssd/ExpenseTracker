@@ -27,20 +27,12 @@ namespace BL.Services
         {
             if(account == null)
             {
-                return new ServiceDataResponse<Account>
-                {
-                    ErrorMessage = "Data cannot be null",
-                    IsSuccess = false,
-                };
+                return ServiceDataResponse<Account>.Failed("Data cannot be null");
             }
 
             if(await _dbContext.Accounts.AnyAsync(a =>  a.Name == account.Name))
             {
-                return new ServiceDataResponse<Account>
-                {
-                    ErrorMessage = "Account with this Name already exists",
-                    IsSuccess = false,
-                };
+                return ServiceDataResponse<Account>.Failed("Account with this name already exist");
             }
 
             var accountId = Guid.NewGuid();
@@ -51,11 +43,7 @@ namespace BL.Services
             _dbContext.Accounts.Add(dalAccount);
             await _dbContext.SaveChangesAsync();
 
-            return new ServiceDataResponse<Account>
-            {
-                IsSuccess = true,
-                Data = blAccount,
-            };
+            return ServiceDataResponse<Account>.Succeeded(blAccount);
         }
 
         public async Task<ServiceResponse> DeleteAccountAsync(Guid id)
@@ -63,11 +51,7 @@ namespace BL.Services
             var dalAccount = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Id == id);
             if (dalAccount == null)
             {
-                return new ServiceDataResponse<Guid>
-                {
-                    ErrorMessage = "Account with this Id doesnt exists",
-                    IsSuccess = false,
-                };
+                return ServiceResponse.Failed("Account doesnt exist");
             }
 
             _dbContext.Accounts.Remove(dalAccount);
@@ -75,11 +59,7 @@ namespace BL.Services
             dalAccount.IsDeleted = true;
             await _dbContext.SaveChangesAsync();
 
-            return new ServiceDataResponse<Guid>
-            {
-                IsSuccess = true,
-                Data = id,
-            };
+            return ServiceResponse.Succeeded();
         }
 
         public async Task<ServiceDataResponse<Account>> GetAccountByIdAsync(Guid id)
@@ -88,20 +68,12 @@ namespace BL.Services
 
             if(dalAccount == null)
             {
-                return new ServiceDataResponse<Account>
-                {
-                    ErrorMessage = "Account doesnt exsist",
-                    IsSuccess = false,
-                };
+                return ServiceDataResponse<Account>.Failed("Account with this Id doesnt exist");
             }
 
             var blAccount = _mapper.Map<Account>(dalAccount);
 
-            return new ServiceDataResponse<Account>
-            {
-                IsSuccess = true,
-                Data = blAccount,
-            };
+            return ServiceDataResponse<Account>.Succeeded(blAccount);
         }
 
         public async Task<ServiceDataResponse<IEnumerable<Account>>> GetAccountsAsync()
@@ -110,20 +82,12 @@ namespace BL.Services
 
             if(accounts == null)
             {
-                return new ServiceDataResponse<IEnumerable<Account>>
-                {
-                    ErrorMessage = "Accounts doesnt exsist",
-                    IsSuccess = false,
-                };
+                return ServiceDataResponse<IEnumerable<Account>>.Failed("Accounts doesnt exist")
             }
 
             var blAccounts = _mapper.Map<IEnumerable<Account>>(accounts);
 
-            return new ServiceDataResponse<IEnumerable<Account>>
-            {
-                IsSuccess = true,
-                Data = blAccounts
-            };
+            return ServiceDataResponse<IEnumerable<Account>>.Succeeded(blAccounts);
         }
 
         public async Task<ServiceDataResponse<Account>> UpdateAccountAsync(Account account)
@@ -132,11 +96,7 @@ namespace BL.Services
 
             if (dalAccount == null)
             {
-                return new ServiceDataResponse<Account>
-                {
-                    ErrorMessage = "Category doesnt exist",
-                    IsSuccess = false
-                };
+                return ServiceDataResponse<Account>.Failed("Account doesnt exist");
             }
 
             _dbContext.Accounts.Update(dalAccount);
@@ -145,11 +105,8 @@ namespace BL.Services
 
             var blAccount = _mapper.Map<Account>(dalAccount);
 
-            return new ServiceDataResponse<Account>()
-            {
-                IsSuccess = true,
-                Data = blAccount
-            };
+            return  ServiceDataResponse<Account>.Succeeded(blAccount);
+            
         }
     }
 }

@@ -2,6 +2,7 @@
 using BL.Services.Interfaces;
 using DAL.Models;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Helpers;
 
 namespace WebAPI.Controllers
 {
@@ -19,31 +20,62 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("create")]
+        [ValidationFilter]
         public async Task<IActionResult> CreateAccount([FromBody] Account account)
         {
-            return Json(await _accountService.CreateAccountAsync(_mapper.Map<BL.Models.Account>(account)));
+            var result = await _accountService.CreateAccountAsync(_mapper.Map<BL.Models.Account>(account));
+
+            if(!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return Json(result);
         }
 
         [HttpDelete]
         [Route("delete")]
+        [ValidationFilter]
         public async Task<IActionResult> DeleteAccount([FromQuery] Guid id)
         {
-            return Json(await _accountService.DeleteAccountAsync(id));
+            var result = await _accountService.DeleteAccountAsync(id);
+
+            if(!result.IsSuccess)
+            {
+                return NotFound(result.ErrorMessage);
+            }
+
+            return Ok();
         }
 
         [HttpGet]
         [Route("get")]
+        [ValidationFilter]
         public async Task<IActionResult> GetAccount([FromQuery] Guid id)
         {
-            return Json(await _accountService.GetAccountByIdAsync(id));
+            var result = await _accountService.GetAccountByIdAsync(id);
+
+            if (!result.IsSuccess)
+            {
+                return NotFound(result.ErrorMessage);
+            }
+
+            return Json(result);
         }
 
         [HttpPut]
-        [Route("put")]
+        [Route("update")]
+        [ValidationFilter]
         public async Task<IActionResult> UpdateAccount([FromQuery] Account account)
         {
-            var blAccount = _mapper.Map<BL.Models.Account>(account);
-            return Json(await _accountService.UpdateAccountAsync(blAccount));
+            var result = await _accountService.UpdateAccountAsync(_mapper.Map<BL.Models.Account>(account));
+
+            if(!result.IsSuccess)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return Json(result);
         }
 
 
