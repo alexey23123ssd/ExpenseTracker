@@ -3,12 +3,6 @@ using BL.Models;
 using BL.Services.Interfaces;
 using DAL;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BL.Services
 {
@@ -82,7 +76,7 @@ namespace BL.Services
 
             if(accounts == null)
             {
-                return ServiceDataResponse<IEnumerable<Account>>.Failed("Accounts doesnt exist")
+                return ServiceDataResponse<IEnumerable<Account>>.Failed("Accounts doesnt exist");
             }
 
             var blAccounts = _mapper.Map<IEnumerable<Account>>(accounts);
