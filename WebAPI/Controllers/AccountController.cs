@@ -21,7 +21,7 @@ namespace WebAPI.Controllers
         [HttpPost]
         [Route("create")]
         [ValidationFilter]
-        public async Task<IActionResult> CreateAccount([FromBody] Account account)
+        public async Task<IActionResult> CreateAccount([FromBody] DTO.Account account)
         {
             var result = await _accountService.CreateAccountAsync(_mapper.Map<BL.Models.Account>(account));
 
@@ -30,7 +30,8 @@ namespace WebAPI.Controllers
                 return BadRequest(result.ErrorMessage);
             }
 
-            return Json(result);
+            var t = Json(result);
+            return t;
         }
 
         [HttpDelete]
@@ -66,7 +67,7 @@ namespace WebAPI.Controllers
         [HttpPut]
         [Route("update")]
         [ValidationFilter]
-        public async Task<IActionResult> UpdateAccount([FromQuery] Account account)
+        public async Task<IActionResult> UpdateAccount([FromQuery] DTO.Account account)
         {
             var result = await _accountService.UpdateAccountAsync(_mapper.Map<BL.Models.Account>(account));
 
@@ -77,7 +78,5 @@ namespace WebAPI.Controllers
 
             return Json(result);
         }
-
-
     }
 }

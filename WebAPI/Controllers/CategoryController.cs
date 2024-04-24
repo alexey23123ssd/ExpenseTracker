@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BL.Services;
 using BL.Services.Interfaces;
-using DTO;
+using DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -20,7 +20,7 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("create")]
-        public async Task<IActionResult> CreateCategory([FromBody]Category category)
+        public async Task<IActionResult> CreateCategory([FromBody] DTO.Category category)
         {
             return Json(await _categoryService.CreateCategoryAsync(_mapper.Map<BL.Models.Category>(category)));
         }
@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
 
         [HttpPut]
         [Route("put")]
-        public async Task<IActionResult> UpdateCategory([FromQuery] Category category)
+        public async Task<IActionResult> UpdateCategory([FromQuery] DTO.Category category)
         {
             var blCategory = _mapper.Map<BL.Models.Category>(category);
             return Json(await _categoryService.UpdateCategoryAsync(blCategory));

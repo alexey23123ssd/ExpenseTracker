@@ -19,20 +19,12 @@ namespace BL.Services
         {
             if(category == null)
             {
-               return new ServiceDataResponse<Category>
-                {
-                    ErrorMessage = "Data cannot be null",
-                    IsSuccess = false
-                };
+               return  ServiceDataResponse<Category>.Failed("Data cannot be null");
             }
 
             if(await _dbContext.Categories.AnyAsync(c => c.Id == category.Id))
             {
-                return new ServiceDataResponse<Category>
-                {
-                    ErrorMessage = "Category with this Id already exist",
-                    IsSuccess = false
-                };
+                return ServiceDataResponse<Category>.Failed("Category with this name already exist");
             }
 
             var categoryId = Guid.NewGuid();
@@ -44,11 +36,7 @@ namespace BL.Services
 
             await _dbContext.SaveChangesAsync();
 
-            return new ServiceDataResponse<Category>
-            {
-                IsSuccess = true,
-                Data = blCategory,
-            };
+            return ServiceDataResponse<Category>.Succeeded(blCategory);
         }
 
         public async Task<ServiceResponse> DeleteCategoryAsync(Guid categoryId)
@@ -56,11 +44,7 @@ namespace BL.Services
             var dalCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
             if (dalCategory == null)
             {
-                return new ServiceDataResponse<Guid>
-                {
-                    ErrorMessage = "Category doesn't exist",
-                    IsSuccess = false
-                };
+                return ServiceResponse.Failed("Category doesnt exist");
             }
 
             _dbContext.Categories.Remove(dalCategory);
@@ -69,11 +53,7 @@ namespace BL.Services
 
             await _dbContext.SaveChangesAsync();
 
-            return new ServiceDataResponse<Guid>
-            {
-                IsSuccess = true,
-                Data = categoryId,
-            };
+            return ServiceResponse.Succeeded();
         }
 
         public async Task<ServiceDataResponse<Category>> GetCategoryByIdAsync(Guid categoryId)
@@ -82,20 +62,12 @@ namespace BL.Services
 
             if (dalCategory==null)
             {
-                return new ServiceDataResponse<Category>
-                {
-                    ErrorMessage = "Category doesn't exist",
-                    IsSuccess = false
-                };
+                return ServiceDataResponse<Category>.Failed("Category with this Id doesnt exist");
             }
 
             var blCategory=_mapper.Map<Category>(dalCategory);
 
-            return new ServiceDataResponse<Category>
-            {
-                IsSuccess = true,
-                Data = blCategory
-            };
+            return ServiceDataResponse<Category>.Succeeded(blCategory);
         }
 
         public async Task<ServiceDataResponse<IEnumerable<Category>>> GetCategoriesAsync()
@@ -103,20 +75,12 @@ namespace BL.Services
             var categories = await _dbContext.Categories.ToListAsync();
             if (categories == null)
             {
-                return new ServiceDataResponse<IEnumerable<Category>>
-                {
-                    ErrorMessage = "Account doesnt have any categories",
-                    IsSuccess = false
-                };
+                return ServiceDataResponse<IEnumerable<Category>>.Failed("Categories doesnt exist");
             }
 
             var blCategories = _mapper.Map<IEnumerable<Category>>(categories);
 
-            return new ServiceDataResponse<IEnumerable<Category>>() 
-            {
-                IsSuccess = true,
-                Data = blCategories
-            };
+            return ServiceDataResponse<IEnumerable<Category>>.Succeeded(blCategories);
         }
 
         public async Task<ServiceDataResponse<Category>> UpdateCategoryAsync(Category category)
@@ -125,11 +89,7 @@ namespace BL.Services
 
             if (dalCategory==null)
             {
-                return new ServiceDataResponse<Category>
-                {
-                    ErrorMessage = "Category doesnt exist",
-                    IsSuccess = false
-                };
+                return ServiceDataResponse<Category>.Failed("Category doesnt exist");
             }
 
             _dbContext.Categories.Update(dalCategory);
@@ -138,11 +98,7 @@ namespace BL.Services
 
             var blCategory = _mapper.Map<Category>(dalCategory);
 
-            return new ServiceDataResponse<Category>()
-            {
-                IsSuccess = true,
-                Data = blCategory
-            };
+            return ServiceDataResponse<Category>.Succeeded(blCategory);
         }
     }
 }

@@ -22,11 +22,12 @@ namespace BL.Services
         {
             if (expense == null)
             {
-                return new ServiceDataResponse<Expense>
-                {
-                    ErrorMessage = "Data cannot be null",
-                    IsSuccess = false,
-                };
+                return ServiceDataResponse<Expense>.Failed("Data cannot be null");
+            }
+
+            if (await _dbContext.Accounts.AnyAsync(e => e.Id == expense.Id))
+            {
+                return ServiceDataResponse<Expense>.Failed("Expense with this id already exist");
             }
 
             var expenseId = Guid.NewGuid();
@@ -37,23 +38,16 @@ namespace BL.Services
             _dbContext.Expenses.Add(dalExpense);
             await _dbContext.SaveChangesAsync();
 
-            return new ServiceDataResponse<Expense>
-            {
-                IsSuccess = true,
-                Data = blExpense,
-            };
+            return ServiceDataResponse<Expense>.Succeeded(blExpense);
         }
 
         public async Task<ServiceResponse> DeleteExpenseAsync(Guid id)
         {
             var dalExpense = await _dbContext.Accounts.SingleOrDefaultAsync(e => e.Id == id);
+
             if (dalExpense == null)
             {
-                return new ServiceDataResponse<Guid>
-                {
-                    ErrorMessage = "Expense with this Id doesnt exists",
-                    IsSuccess = false,
-                };
+                return ServiceResponse.Failed("Expense with this id doesnt exist");
             }
 
             _dbContext.Accounts.Remove(dalExpense);
@@ -61,11 +55,7 @@ namespace BL.Services
             dalExpense.IsDeleted = true;
             await _dbContext.SaveChangesAsync();
 
-            return new ServiceDataResponse<Guid>
-            {
-                IsSuccess = true,
-                Data = id,
-            };
+            return ServiceResponse.Succeeded();
         }
 
         public async Task<ServiceDataResponse<Expense>> GetExpenseByIdAsync(Guid id)
@@ -74,20 +64,12 @@ namespace BL.Services
 
             if (dalExpense == null)
             {
-                return new ServiceDataResponse<Expense>
-                {
-                    ErrorMessage = "Expense  with this Id doesnt exists",
-                    IsSuccess = false,
-                };
+                return ServiceDataResponse<Expense>.Failed("Account with this Id doesnt exist");
             }
 
             var blExpense = _mapper.Map<Expense>(dalExpense);
 
-            return new ServiceDataResponse<Expense>
-            {
-                IsSuccess = true,
-                Data = blExpense,
-            };
+            return ServiceDataResponse<Expense>.Succeeded(blExpense);
         }
 
         public async Task<ServiceDataResponse<IEnumerable<Expense>>> GetExpensesAsync(Models.Account? account)
@@ -96,21 +78,14 @@ namespace BL.Services
 
             if (expenses == null)
             {
-                return new ServiceDataResponse<IEnumerable<Expense>>
-                {
-                    ErrorMessage = "Expenses doesnt exsist",
-                    IsSuccess = false,
-                };
+                return ServiceDataResponse<IEnumerable<Expense>>.Failed("Expenses doesnt exist");
             }
 
             var blExpenses = _mapper.Map<IEnumerable<Expense>>(expenses);
 
-            return new ServiceDataResponse<IEnumerable<Expense>>
-            {
-                IsSuccess = true,
-                Data = blExpenses
-            };
+            return ServiceDataResponse<IEnumerable<Expense>>.Succeeded(blExpenses);
         }
+
 
         public async Task<ServiceDataResponse<Expense>> UpdateExpenseAsync(Expense expense)
         {
@@ -118,11 +93,7 @@ namespace BL.Services
 
             if (dalExpense == null)
             {
-                return new ServiceDataResponse<Expense>
-                {
-                    ErrorMessage = "Expense doesnt exist",
-                    IsSuccess = false
-                };
+                return ServiceDataResponse<Expense>.Failed("Expense doesnt exist");
             }
 
             _dbContext.Expenses.Update(dalExpense);
@@ -131,11 +102,7 @@ namespace BL.Services
 
             var blExpense = _mapper.Map<Expense>(dalExpense);
 
-            return new ServiceDataResponse<Expense>()
-            {
-                IsSuccess = true,
-                Data = blExpense
-            };
+            return ServiceDataResponse<Expense>.Succeeded(blExpense);
         }
     }
 }
