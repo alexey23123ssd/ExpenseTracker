@@ -64,6 +64,21 @@ namespace WebAPI.Controllers
             return Json(result);
         }
 
+        [HttpGet]
+        [Route("getAccs")]
+        [ValidationFilter]
+        public async Task<IActionResult> GetAccounts()
+        {
+            var result = await _accountService.GetAccountsAsync();
+
+            if (!result.IsSuccess)
+            {
+                return NotFound(result.ErrorMessage);
+            }
+
+            return Json(result);
+        }
+
         [HttpPut]
         [Route("update")]
         [ValidationFilter]
