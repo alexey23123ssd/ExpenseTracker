@@ -20,10 +20,14 @@ namespace WebAPI.Controllers
 
         [HttpPost]
         [Route("create")]
-        [ValidationFilter]
         public async Task<IActionResult> CreateAccount([FromBody] DTO.Account account)
         {
             var result = await _accountService.CreateAccountAsync(_mapper.Map<BL.Models.Account>(account));
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             if(!result.IsSuccess)
             {
@@ -36,12 +40,16 @@ namespace WebAPI.Controllers
 
         [HttpDelete]
         [Route("delete")]
-        [ValidationFilter]
         public async Task<IActionResult> DeleteAccount([FromQuery] Guid id)
         {
             var result = await _accountService.DeleteAccountAsync(id);
 
-            if(!result.IsSuccess)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!result.IsSuccess)
             {
                 return NotFound(result.ErrorMessage);
             }
@@ -51,10 +59,14 @@ namespace WebAPI.Controllers
 
         [HttpGet]
         [Route("get")]
-        [ValidationFilter]
         public async Task<IActionResult> GetAccount([FromQuery] Guid id)
         {
             var result = await _accountService.GetAccountByIdAsync(id);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             if (!result.IsSuccess)
             {
@@ -66,10 +78,14 @@ namespace WebAPI.Controllers
 
         [HttpGet]
         [Route("getAccs")]
-        [ValidationFilter]
         public async Task<IActionResult> GetAccounts()
         {
             var result = await _accountService.GetAccountsAsync();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             if (!result.IsSuccess)
             {
@@ -81,12 +97,16 @@ namespace WebAPI.Controllers
 
         [HttpPut]
         [Route("update")]
-        [ValidationFilter]
         public async Task<IActionResult> UpdateAccount([FromQuery] DTO.Account account)
         {
             var result = await _accountService.UpdateAccountAsync(_mapper.Map<BL.Models.Account>(account));
 
-            if(!result.IsSuccess)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!result.IsSuccess)
             {
                 return BadRequest(result.ErrorMessage);
             }

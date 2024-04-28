@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BL", "BL\BL.csproj", "{37B4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DTO", "DTO\DTO.csproj", "{249FDB2E-BC7C-4F2F-93A6-EED316391122}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExspenseTracker.UnitTests", "ExspenseTracker.UnitTests\ExspenseTracker.UnitTests.csproj", "{F85E1163-D6CC-4173-9F50-39D854D4EC05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "ExspenseTracker.UnitTests\UnitTests.csproj", "{F85E1163-D6CC-4173-9F50-39D854D4EC05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
