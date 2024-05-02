@@ -34,8 +34,7 @@ namespace WebAPI.Controllers
                 return BadRequest(result.ErrorMessage);
             }
 
-            var t = Json(result);
-            return t;
+            return Json(result);
         }
 
         [HttpDelete]
@@ -54,7 +53,7 @@ namespace WebAPI.Controllers
                 return NotFound(result.ErrorMessage);
             }
 
-            return Ok();
+            return Ok(result);
         }
 
         [HttpGet]

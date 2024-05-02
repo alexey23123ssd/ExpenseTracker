@@ -28,21 +28,21 @@ namespace UnitTests
                     Name = "Test",
                 };
                 var serviceResponse = new ServiceDataResponse<Account>();
-
+                serviceResponse.IsSuccess = true;
                 var accountService = new Mock<IAccountService>();
                 accountService.Setup(x => x.CreateAccountAsync(It.IsAny<Account>()))
                     .ReturnsAsync(serviceResponse)
                     .Verifiable();
                 var mapper = new Mock<IMapper>();
-                mapper.Setup(x => x.Map<Account>(It.IsAny<DAL.Models.Account>()));
+                var a = mapper.Setup(x => x.Map<Account>(It.IsAny<DTO.Account>()));
                 _accountController = new AccountController(accountService.Object, mapper.Object);
 
                 //Act
-                var result = _accountController.CreateAccount(account);
+                var task = _accountController.CreateAccount(account);
                 //Assert
-                Assert.IsNotNull(result);
-                Assert.IsInstanceOf<JsonResult>(result);
-                var jsonResult = result.Result as JsonResult;
+                Assert.IsNotNull(task);
+                Assert.IsInstanceOf<JsonResult>(task.Result);
+                var jsonResult = task.Result as JsonResult;
                 Assert.IsAssignableFrom<ServiceDataResponse<Account>>(jsonResult.Value);
                 accountService.Verify();
             }
@@ -69,7 +69,7 @@ namespace UnitTests
                 //Act
                 var result = _accountController.CreateAccount(account);
                 //Assert
-                Assert.IsInstanceOf<BadRequestObjectResult>(result);
+                Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
             }
 
             [Test]
@@ -77,9 +77,11 @@ namespace UnitTests
             {
                 //Arrange
                 Guid id = Guid.NewGuid();
+                var serviceResponse = new ServiceResponse();
+                serviceResponse.IsSuccess = true;
                 var accountService = new Mock<IAccountService>();
                 accountService.Setup(x => x.DeleteAccountAsync(It.IsAny<Guid>()))
-                    .ReturnsAsync(new ServiceResponse())
+                    .ReturnsAsync(serviceResponse)
                     .Verifiable();
                 var mapper = new Mock<IMapper>();
                 _accountController = new AccountController(accountService.Object, mapper.Object);
@@ -87,7 +89,7 @@ namespace UnitTests
                 var result = _accountController.DeleteAccount(id);
                 //Assert
                 Assert.IsNotNull(result);
-                Assert.IsInstanceOf<OkObjectResult>(result);
+                Assert.IsInstanceOf<OkObjectResult>(result.Result);
                 var model = result.Result as OkObjectResult;
                 Assert.IsAssignableFrom<ServiceDataResponse<Account>>(model.Value);
             }
@@ -107,27 +109,27 @@ namespace UnitTests
                 //Act
                 var result = _accountController.DeleteAccount(id);
                 //Assert
-                Assert.IsInstanceOf<BadRequestObjectResult>(result);
+                Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
             }
 
             [Test]
             public void DeleteAccount_ModelNotDeleted_ModelStateIsNotFound()
             {
                 //Arrange
-                ServiceResponse nullObj = null;
+                var serviceResult = new ServiceResponse();
+                serviceResult.IsSuccess = false;
                 Guid id = Guid.NewGuid();
                 var accountService = new Mock<IAccountService>();
                 accountService.Setup(x => x.DeleteAccountAsync(It.IsAny<Guid>()))
-                    .ReturnsAsync(nullObj)
+                    .ReturnsAsync(serviceResult)
                     .Verifiable();
                 var mapper = new Mock<IMapper>();
                 _accountController = new AccountController(accountService.Object, mapper.Object);
                 //Act
                 var result = _accountController.DeleteAccount(id);
                 //Assert
-                Assert.IsInstanceOf<NotFoundObjectResult>(result);
+                Assert.IsInstanceOf<NotFoundObjectResult>(result.Result);
                 var notFoundObject = result.Result as NotFoundObjectResult;
-                var a = notFoundObject.Value;
                 Assert.That(notFoundObject.Value.ToString(), Is.EqualTo("Account doesnt exist"));
                 Assert.That(notFoundObject.StatusCode, Is.EqualTo(StatusCodes.Status404NotFound));
             }
@@ -146,7 +148,7 @@ namespace UnitTests
                 //Act
                 var result = _accountController.GetAccount(id);
                 //Assert
-                Assert.IsInstanceOf<JsonResult>(result);
+                Assert.IsInstanceOf<JsonResult>(result.Result);
                 var model = result.Result as JsonResult;
                 Assert.IsAssignableFrom<ServiceDataResponse<Account>>(model.Value);
             }
@@ -166,7 +168,7 @@ namespace UnitTests
                 //Act
                 var result = _accountController.GetAccount(id);
                 //Assert
-                Assert.IsInstanceOf<BadRequestObjectResult>(result);
+                Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
             }
 
             [Test]
@@ -184,7 +186,7 @@ namespace UnitTests
                 //Act
                 var result = _accountController.GetAccount(id);
                 //Assert
-                Assert.IsInstanceOf<NotFoundObjectResult>(result);
+                Assert.IsInstanceOf<NotFoundObjectResult>(result.Result);
                 var notFoundObject = result.Result as NotFoundObjectResult;
                 var a = notFoundObject.Value;
                 Assert.That(notFoundObject.Value.ToString(), Is.EqualTo("Account with this Id doesnt exist"));
@@ -225,7 +227,7 @@ namespace UnitTests
             //Act
             var result = _accountController.GetAccounts();
             //Asser
-            Assert.IsInstanceOf<JsonResult>(result);
+            Assert.IsInstanceOf<JsonResult>(result.Result);
             var model = result.Result as JsonResult;
             Assert.IsAssignableFrom<ServiceDataResponse<IEnumerable<Account>>>(model.Value);
         }
